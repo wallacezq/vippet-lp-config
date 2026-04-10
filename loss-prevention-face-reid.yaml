@@ -1,0 +1,157 @@
+# Reference: Loss Prevention - Face Re-identification pipeline (sweet_heartening workload)
+# https://github.com/open-edge-platform/edge-ai-libraries
+name: Loss Prevention - Face Re-identification
+definition: >
+  The Loss Prevention Face Re-identification Pipeline uses
+  face-detection-retail-0004 for face detection and
+  face-reidentification-retail-0095 for face re-identification, designed
+  for retail loss prevention applications. It detects faces and performs
+  re-identification to track known individuals (sweet-heartening scenario),
+  enabling alerts for repeat offenders or persons of interest.
+tags:
+  - Retail
+  - Loss Prevention
+  - Re-identification
+thumbnail: images/age-and-gender-recognition.png
+variants:
+  - name: CPU
+    pipeline_description: >-
+      filesrc location=/videos/input/face-reidentification.mp4 !
+      decodebin3 !
+      gvadetect
+        batch-size=1
+        model-instance-id=facedetect0-cpu
+        model=/models/output/omz/face-detection-retail-0004/FP16/face-detection-retail-0004.xml
+        model-proc=/models/output/omz/face-detection-retail-0004/face-detection-retail-0004.json
+        threshold=0.5
+        inference-interval=3
+        scale-method=fast
+        inference-region=full-frame
+        device=CPU
+        pre-process-backend=opencv
+        ie-config=CPU_THROUGHPUT_STREAMS=2
+        nireq=2 !
+      queue !
+      gvatrack tracking-type=zero-term-imageless !
+      queue !
+      gvainference
+        model-instance-id=facereid0-cpu
+        model=/models/output/omz/face-reidentification-retail-0095/FP16/face-reidentification-retail-0095.xml
+        device=CPU
+        pre-process-backend=opencv
+        ie-config=CPU_THROUGHPUT_STREAMS=2
+        nireq=2 !
+      queue !
+      gvafpscounter starting-frame=100 !
+      gvawatermark !
+      gvametaconvert format=json !
+      queue !
+      gvametapublish file-format=json-lines file-path=/dev/null !
+      videoscale !
+      video/x-raw,width=320,height=240 !
+      fakesink name=default_output_sink sync=false async=false
+  - name: GPU
+    pipeline_description: >-
+      filesrc location=/videos/input/face-reidentification.mp4 !
+      decodebin3 !
+      gvadetect
+        batch-size=1
+        model-instance-id=facedetect0-gpu
+        model=/models/output/omz/face-detection-retail-0004/FP16/face-detection-retail-0004.xml
+        model-proc=/models/output/omz/face-detection-retail-0004/face-detection-retail-0004.json
+        threshold=0.5
+        inference-interval=3
+        scale-method=fast
+        inference-region=full-frame
+        device=GPU
+        pre-process-backend=va-surface-sharing
+        ie-config=GPU_THROUGHPUT_STREAMS=2
+        nireq=2 !
+      queue !
+      gvatrack tracking-type=zero-term-imageless !
+      queue !
+      gvainference
+        model-instance-id=facereid0-gpu
+        model=/models/output/omz/face-reidentification-retail-0095/FP16/face-reidentification-retail-0095.xml
+        device=GPU
+        pre-process-backend=va-surface-sharing
+        ie-config=GPU_THROUGHPUT_STREAMS=2
+        nireq=2 !
+      queue !
+      gvafpscounter starting-frame=100 !
+      gvawatermark !
+      gvametaconvert format=json !
+      queue !
+      gvametapublish file-format=json-lines file-path=/dev/null !
+      videoscale !
+      video/x-raw,width=320,height=240 !
+      fakesink name=default_output_sink sync=false async=false
+  - name: NPU
+    pipeline_description: >-
+      filesrc location=/videos/input/face-reidentification.mp4 !
+      decodebin3 !
+      gvadetect
+        batch-size=1
+        model-instance-id=facedetect0-npu
+        model=/models/output/omz/face-detection-retail-0004/FP16/face-detection-retail-0004.xml
+        model-proc=/models/output/omz/face-detection-retail-0004/face-detection-retail-0004.json
+        threshold=0.5
+        inference-interval=3
+        scale-method=fast
+        inference-region=full-frame
+        device=NPU
+        pre-process-backend=va
+        nireq=4 !
+      queue !
+      gvatrack tracking-type=zero-term-imageless !
+      queue !
+      gvainference
+        model-instance-id=facereid0-npu
+        model=/models/output/omz/face-reidentification-retail-0095/FP16/face-reidentification-retail-0095.xml
+        device=NPU
+        pre-process-backend=va
+        nireq=4 !
+      queue !
+      gvafpscounter starting-frame=100 !
+      gvawatermark !
+      gvametaconvert format=json !
+      queue !
+      gvametapublish file-format=json-lines file-path=/dev/null !
+      videoscale !
+      video/x-raw,width=320,height=240 !
+      fakesink name=default_output_sink sync=false async=false
+  - name: GPU_NPU
+    pipeline_description: >-
+      filesrc location=/videos/input/face-reidentification.mp4 !
+      decodebin3 !
+      gvadetect
+        batch-size=1
+        model-instance-id=facedetect0-gpu-npu
+        model=/models/output/omz/face-detection-retail-0004/FP16/face-detection-retail-0004.xml
+        model-proc=/models/output/omz/face-detection-retail-0004/face-detection-retail-0004.json
+        threshold=0.5
+        inference-interval=3
+        scale-method=fast
+        inference-region=full-frame
+        device=GPU
+        pre-process-backend=va-surface-sharing
+        ie-config=GPU_THROUGHPUT_STREAMS=2
+        nireq=2 !
+      queue !
+      gvatrack tracking-type=zero-term-imageless !
+      queue !
+      gvainference
+        model-instance-id=facereid0-gpu-npu
+        model=/models/output/omz/face-reidentification-retail-0095/FP16/face-reidentification-retail-0095.xml
+        device=NPU
+        pre-process-backend=va
+        nireq=4 !
+      queue !
+      gvafpscounter starting-frame=100 !
+      gvawatermark !
+      gvametaconvert format=json !
+      queue !
+      gvametapublish file-format=json-lines file-path=/dev/null !
+      videoscale !
+      video/x-raw,width=320,height=240 !
+      fakesink name=default_output_sink sync=false async=false
