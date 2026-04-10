@@ -7,11 +7,11 @@ an existing [ViPPET](https://github.com/open-edge-platform/edge-ai-libraries/tre
 
 The following pipeline definitions are provided:
 
-| File | Description |
-|------|-------------|
-| `loss-prevention-retail.yaml` | Object detection (YOLO 11n) + classification (EfficientNet B0) for retail loss prevention workloads |
+| File                             | Description                                                                                         |
+| -------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `loss-prevention-retail.yaml`    | Object detection (YOLO 11n) + classification (EfficientNet B0) for retail loss prevention workloads |
 | `loss-prevention-face-reid.yaml` | Face detection (face-detection-retail-0004) + re-identification (face-reidentification-retail-0095) |
-| `loss-prevention-detection.yaml` | Object detection only (YOLO 11n) for benchmarking |
+| `loss-prevention-detection.yaml` | Object detection only (YOLO 11n) for benchmarking                                                   |
 
 Each file includes CPU, GPU, NPU, and GPU\_NPU variants (detection-only has CPU, GPU, NPU).
 
@@ -55,12 +55,12 @@ cp configs/vippet/loss-prevention-detection.yaml     $PIPELINES_DIR/
 The pipelines require the following models. Use ViPPET's model management to
 install them, or ensure they are present under `shared/models/output/`:
 
-| Model | Path in Container | Source |
-|-------|-------------------|--------|
-| YOLO 11n (INT8) | `/models/output/public/yolo11n/INT8/yolo11n.xml` | Ultralytics YOLO 11n, quantized to INT8 |
-| EfficientNet B0 (INT8) | `/models/output/object_classification/efficientnet-b0/INT8/efficientnet-b0.xml` | EfficientNet B0, quantized to INT8 |
-| face-detection-retail-0004 (FP16) | `/models/output/omz/face-detection-retail-0004/FP16/face-detection-retail-0004.xml` | OpenVINO Model Zoo |
-| face-reidentification-retail-0095 (FP16) | `/models/output/omz/face-reidentification-retail-0095/FP16/face-reidentification-retail-0095.xml` | OpenVINO Model Zoo |
+| Model                                    | Path in Container                                                                                 | Source                                  |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| YOLO 11n (INT8)                          | `/models/output/public/yolo11n/INT8/yolo11n.xml`                                                  | Ultralytics YOLO 11n, quantized to INT8 |
+| EfficientNet B0 (INT8)                   | `/models/output/object_classification/efficientnet-b0/INT8/efficientnet-b0.xml`                   | EfficientNet B0, quantized to INT8      |
+| face-detection-retail-0004 (FP16)        | `/models/output/omz/face-detection-retail-0004/FP16/face-detection-retail-0004.xml`               | OpenVINO Model Zoo                      |
+| face-reidentification-retail-0095 (FP16) | `/models/output/omz/face-reidentification-retail-0095/FP16/face-reidentification-retail-0095.xml` | OpenVINO Model Zoo                      |
 
 To install models using ViPPET's built-in model manager:
 
@@ -75,7 +75,9 @@ they will be automatically mounted into the container at `/models/output/`.
 
 ### Step 4: Prepare Input Videos
 
-Place your test video files in the ViPPET shared videos directory:
+Download the sample video from [google drive](https://drive.google.com/drive/folders/1yg6cfxAASvCGwzJeAufn3XTxbhCf2ihi?usp=drive_link).
+
+Then, place your test video files in the ViPPET shared videos directory:
 
 ```bash
 cp your-video.mp4 shared/videos/items-in-basket.mp4
@@ -130,10 +132,10 @@ in each variant's `pipeline_description` to match your model paths.
 
 Key parameters that can be adjusted per variant:
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `batch-size` | Inference batch size | `1` |
-| `inference-interval` | Run inference every N frames | `3` |
-| `threshold` | Detection confidence threshold | `0.5` |
-| `nireq` | Number of inference requests | `2` (CPU/GPU), `4` (NPU) |
-| `ie-config` | OpenVINO throughput streams | `CPU_THROUGHPUT_STREAMS=2` or `GPU_THROUGHPUT_STREAMS=2` |
+| Parameter            | Description                    | Default                                                  |
+| -------------------- | ------------------------------ | -------------------------------------------------------- |
+| `batch-size`         | Inference batch size           | `1`                                                      |
+| `inference-interval` | Run inference every N frames   | `3`                                                      |
+| `threshold`          | Detection confidence threshold | `0.5`                                                    |
+| `nireq`              | Number of inference requests   | `2` (CPU/GPU), `4` (NPU)                                 |
+| `ie-config`          | OpenVINO throughput streams    | `CPU_THROUGHPUT_STREAMS=2` or `GPU_THROUGHPUT_STREAMS=2` |
